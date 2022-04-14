@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerStateMachine : MonoBehaviour
 {
     [HideInInspector] public Rigidbody rigidbodyComponent;
+    [HideInInspector] public Animator animatorComponent;
     public PlayerInputActions playerInputActions;
     [SerializeField] private Camera cam;
     [HideInInspector] public Vector2 moveVector = new Vector2(0, 0);
@@ -38,6 +39,7 @@ public class PlayerStateMachine : MonoBehaviour
         playerInputActions.Player.Run.performed += RunKeyPressed;
         playerInputActions.Player.Run.canceled += RunKeyCanceled;
         rigidbodyComponent = GetComponent<Rigidbody>();
+        animatorComponent = GetComponent<Animator>();
         currentState = startingState;
     }
     void Update()

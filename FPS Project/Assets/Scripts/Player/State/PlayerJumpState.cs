@@ -5,6 +5,7 @@ public class PlayerJumpState : PlayerBaseState
     {
         if (player.isGrounded)
         {
+            player.animatorComponent.SetBool("Jumping", true);
             player.rigidbodyComponent.AddForce(Vector3.up * player.jumpForce, ForceMode.Impulse);
             player.jumpKeyPressed = false;
             player.SwitchState(player.playerIdleState);

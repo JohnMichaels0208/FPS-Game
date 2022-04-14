@@ -2,6 +2,8 @@ public class PlayerIdleState : PlayerBaseState
 {
     public override void Execute(PlayerStateMachine player)
     {
+        player.animatorComponent.SetBool("Jumping", false);
+        player.animatorComponent.SetFloat("Speed", 0);
         if (player.jumpKeyPressed)
         {
             player.SwitchState(player.playerJumpState);

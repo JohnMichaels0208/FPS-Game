@@ -3,6 +3,8 @@ public class PlayerRunState : PlayerBaseState
 {
     public override void Execute(PlayerStateMachine player)
     {
+        player.animatorComponent.SetBool("Jumping", false);
+        player.animatorComponent.SetFloat("Speed", 1);
         player.rigidbodyComponent.AddRelativeForce(new Vector3(player.moveVector.x, 0, player.moveVector.y) * player.runSpeed, ForceMode.Force);
         if (player.jumpKeyPressed)
         {
