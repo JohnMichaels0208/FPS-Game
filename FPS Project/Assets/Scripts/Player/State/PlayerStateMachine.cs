@@ -5,15 +5,17 @@ public class PlayerStateMachine : MonoBehaviour
 {
     [HideInInspector] public Rigidbody rigidbodyComponent;
     [HideInInspector] public Animator animatorComponent;
-    public PlayerInputActions playerInputActions;
+    private PlayerInputActions playerInputActions;
     [SerializeField] private Camera cam;
     [HideInInspector] public Vector2 moveVector = new Vector2(0, 0);
     [HideInInspector] public bool isGrounded = false;
-    [HideInInspector] public float jumpForce = 150f;
+    [HideInInspector] public float jumpForce = 1500;
     [HideInInspector] public float walkSpeed = 1000;
     [HideInInspector] public float runSpeed = 1500;
     private float sensX = 70f;
     private float sensY = 70f;
+    public readonly float animationDampSpeed = 0.1f;
+    private float cameraZRot = 0;
 
     [HideInInspector] public bool moveKeysPressed = false;
     [HideInInspector] public bool jumpKeyPressed = false;
@@ -26,6 +28,12 @@ public class PlayerStateMachine : MonoBehaviour
 
     private PlayerBaseState startingState;
     public PlayerBaseState currentState;
+
+    private bool cameraRaycast;
+    private RaycastHit cameraRaycastHit;
+    [SerializeField] private GameObject pickUpUI;
+    [SerializeField] private LayerMask cameraRaycastLayerMask;
+
     private void Awake()
     {
         startingState = playerIdleState;
@@ -44,18 +52,43 @@ public class PlayerStateMachine : MonoBehaviour
     }
     void Update()
     {
-        if (currentState != playerWalkState && currentState != playerRunState)
+        if (!currentState.executeInFixedUpdate)
         {
             currentState.Execute(this);
-        }   
+        }
+        else if (currentState == playerWalkState)
+        {
+            animatorComponent.SetFloat("Input X", moveVector.x * 0.5f, animationDampSpeed, Time.deltaTime);
+            animatorComponent.SetFloat("Input Y", moveVector.y * 0.5f, animationDampSpeed, Time.deltaTime);
+        }
+        else if (currentState == playerRunState)
+        {
+            animatorComponent.SetFloat("Input X", moveVector.x, animationDampSpeed, Time.deltaTime);
+            animatorComponent.SetFloat("Input Y", moveVector.y, animationDampSpeed, Time.deltaTime);
+        }
+
         transform.Rotate(new Vector3(0, playerInputActions.Player.RotateX.ReadValue<float>() * sensX * Time.deltaTime, 0));
         cam.transform.Rotate(new Vector3(-playerInputActions.Player.RotateY.ReadValue<float>() * sensY * Time.deltaTime, 0, 0));
-        cam.transform.localEulerAngles = new Vector3(ClampAngle(cam.transform.localEulerAngles.x, -60, 60), 0, 0);
+        cam.transform.localEulerAngles = new Vector3(ClampAngle(cam.transform.localEulerAngles.x, -60, 60), 0, cameraZRot);
+        cameraRaycast = Physics.Raycast(cam.transform.position, cam.transform.forward, out cameraRaycastHit, Mathf.Infinity, cameraRaycastLayerMask);
+        if (cameraRaycast)
+        {
+            if (cameraRaycastHit.transform.tag == "Weapon")
+            {
+                pickUpUI.SetActive(true);
+                pickUpUI.transform.position = cam.WorldToScreenPoint(cameraRaycastHit.transform.position);
+            }
+            else
+            {
+                pickUpUI.SetActive(false);
+            }
+        }
+
     }
 
     private void FixedUpdate()
     {
-        if (currentState == playerWalkState || currentState == playerRunState)
+        if (currentState.executeInFixedUpdate)
         {
             currentState.Execute(this);
         }
