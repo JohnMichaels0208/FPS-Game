@@ -1,6 +1,11 @@
 using UnityEngine;
 public class PlayerWalkState : PlayerBaseState
 {
+    public override bool executeInFixedUpdate
+    {
+        get { return true; }
+        protected set { }
+    }
     public override void Execute(PlayerStateMachine player)
     {
         player.animatorComponent.SetBool("Jumping", false);

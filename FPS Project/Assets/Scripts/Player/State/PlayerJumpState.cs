@@ -1,6 +1,11 @@
 using UnityEngine;
 public class PlayerJumpState : PlayerBaseState
 {
+    public override bool executeInFixedUpdate
+    {
+        get { return false; }
+        protected set { }
+    }
     public override void Execute(PlayerStateMachine player)
     {
         if (player.isGrounded)

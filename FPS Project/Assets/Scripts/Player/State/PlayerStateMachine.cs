@@ -44,10 +44,23 @@ public class PlayerStateMachine : MonoBehaviour
     }
     void Update()
     {
-        if (currentState != playerWalkState && currentState != playerRunState)
+        if (!currentState.executeInFixedUpdate)
         {
             currentState.Execute(this);
-        }   
+
+        }
+        else if (currentState == playerWalkState)
+        {
+            animatorComponent.SetFloat("Input X", moveVector.x * 0.5f);
+            animatorComponent.SetFloat("Input Y", moveVector.y * 0.5f);
+        }
+
+        else if (currentState == playerRunState)
+        {
+            animatorComponent.SetFloat("Input X", moveVector.x);
+            animatorComponent.SetFloat("Input Y", moveVector.y);
+        }
+
         transform.Rotate(new Vector3(0, playerInputActions.Player.RotateX.ReadValue<float>() * sensX * Time.deltaTime, 0));
         cam.transform.Rotate(new Vector3(-playerInputActions.Player.RotateY.ReadValue<float>() * sensY * Time.deltaTime, 0, 0));
         cam.transform.localEulerAngles = new Vector3(ClampAngle(cam.transform.localEulerAngles.x, -60, 60), 0, 0);
@@ -55,7 +68,7 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (currentState == playerWalkState || currentState == playerRunState)
+        if (currentState.executeInFixedUpdate)
         {
             currentState.Execute(this);
         }
