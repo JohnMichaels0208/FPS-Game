@@ -7,8 +7,9 @@ public class PlayerIdleState : PlayerBaseState
     }
     public override void Execute(PlayerStateMachine player)
     {
+        player.animatorComponent.SetFloat("Input X", 0, player.animationDampSpeed, UnityEngine.Time.deltaTime);
+        player.animatorComponent.SetFloat("Input Y", 0, player.animationDampSpeed, UnityEngine.Time.deltaTime);
         player.animatorComponent.SetBool("Jumping", false);
-        player.animatorComponent.SetFloat("Speed", 0);
         if (player.jumpKeyPressed)
         {
             player.SwitchState(player.playerJumpState);
